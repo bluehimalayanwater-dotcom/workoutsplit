@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OLYMPIA | SINGULARITY</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;500;700&family=Syncopate:wght@400;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg-void: #000000;
+            --primary: #FFD700; /* Imperial Gold */
+            --primary-glow: rgba(255, 215, 0, 0.5);
+            --accent-red: #FF003C;
+            --accent-blue: #00F0FF;
+            --accent-green: #00FF9D;
+            --glass-surface: rgba(20, 20, 20, 0.4);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --text-main: #FFFFFF;
+            --text-sub: #888888;
+            --ease-elastic: cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background-color: var(--bg-void);
+            color: var(--text-main);
+            font-family: 'Space Grotesk', sans-serif;
+            min-height: 100vh;
+            overflow-x: hidden;
+            padding-bottom: 150px;
+        }
+
+        /* --- THE REACTOR CORE BACKGROUND --- */
+        .ambient-core {
+            position: fixed;
+            top: -50%; left: -50%;
+            width: 200%; height: 200%;
+            background: 
+                radial-gradient(circle at 50% 50%, rgba(255, 215, 0, 0.03) 0%, transparent 50%),
+                conic-gradient(from 0deg at 50% 50%, transparent 0deg, rgba(255, 215, 0, 0.05) 180deg, transparent 360deg);
+            animation: rotateCore 60s linear infinite;
+            z-index: -1;
+            pointer-events: none;
+        }
+        
+        .grid-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-image: 
+                linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
+            z-index: -1;
+            mask-image: radial-gradient(circle at 50% 50%, black 40%, transparent 80%);
+            -webkit-mask-image: radial-gradient(circle at 50% 50%, black 40%, transparent 80%);
+        }
+
+        @keyframes rotateCore { 100% { transform: rotate(360deg); } }
+
+        /* --- HEADER --- */
+        header {
+            text-align: center;
+            padding: 80px 20px 60px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        h1 {
+            font-family: 'Syncopate', sans-serif;
+            font-weight: 700;
+            font-size: 4rem;
+            text-transform: uppercase;
+            letter-spacing: -2px;
+            margin: 0;
+            background: linear-gradient(180deg, #fff 0%, #666 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            position: relative;
+            display: inline-block;
+        }
+        
+        h1::after {
+            content: 'PROTOCOL';
+            position: absolute;
+            bottom: -15px;
+            right: 0;
+            font-size: 0.8rem;
+            letter-spacing: 10px;
+            color: var(--primary);
+            text-shadow: 0 0 20px var(--primary-glow);
+            -webkit-text-fill-color: var(--primary);
+        }
+
+        /* --- PHASE LOADER --- */
+        .phase-system {
+            display: flex;
+            justify-content: center;
+            gap: 4px;
+            margin-top: 40px;
+        }
+        .phase-node {
+            width: 60px; height: 3px;
+            background: #333;
+            position: relative;
+            overflow: hidden;
+        }
+        .phase-node.active { background: var(--primary); box-shadow: 0 0 15px var(--primary-glow); }
+        .phase-node.active::after {
+            content:''; position: absolute; top:0; left:-100%; width:100%; height:100%;
+            background: linear-gradient(90deg, transparent, #fff, transparent);
+            animation: scan 2s infinite;
+        }
+        @keyframes scan { 100% { left: 100%; } }
+
+        /* --- CONTAINER --- */
+        .container { max-width: 900px; margin: 0 auto; padding: 0 20px; position: relative; z-index: 10; }
+
+        /* --- HUD PANELS (Glassmorphism 3.0) --- */
+        .hud-panel {
+            background: var(--glass-surface);
+            backdrop-filter: blur(40px);
+            -webkit-backdrop-filter: blur(40px);
+            border: 1px solid var(--glass-border);
+            border-top: 1px solid rgba(255,255,255,0.2);
+            border-radius: 4px;
+            padding: 30px;
+            margin-bottom: 25px;
+            position: relative;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            transition: 0.3s;
+        }
+
+        .hud-panel::before {
+            content: ''; position: absolute; top: -1px; left: -1px; width: 10px; height: 10px;
+            border-top: 2px solid var(--primary); border-left: 2px solid var(--primary);
+        }
+        .hud-panel::after {
+            content: ''; position: absolute; bottom: -1px; right: -1px; width: 10px; height: 10px;
+            border-bottom: 2px solid var(--primary); border-right: 2px solid var(--primary);
+        }
+
+        .panel-label {
+            font-family: 'Syncopate'; font-size: 0.7rem; color: var(--text-sub);
+            text-transform: uppercase; letter-spacing: 2px; margin-bottom: 20px; display: block;
+        }
+        
+        .section-divider {
+            text-align: center; margin: 40px 0 20px; color: var(--primary); 
+            font-family: 'Syncopate'; font-size: 0.8rem; letter-spacing: 3px; text-transform: uppercase;
+            text-shadow: 0 0 10px var(--primary-glow);
+        }
+
+        /* --- STATS GRID --- */
+        .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.1); }
+        .stat-cell { background: rgba(0,0,0,0.8); padding: 15px; text-align: center; position: relative; transition: 0.3s; }
+        .stat-cell:hover { background: rgba(20,20,20,0.9); }
+        .stat-cell label { display: block; font-size: 0.6rem; color: var(--text-sub); letter-spacing: 1px; margin-bottom: 5px; text-transform: uppercase; }
+        .stat-cell input { 
+            width: 100%; background: transparent; border: none; color: #fff; 
+            font-family: 'Syncopate'; font-weight: 700; font-size: 1.2rem; text-align: center; 
+        }
+        .stat-cell input:focus { outline: none; color: var(--primary); text-shadow: 0 0 20px var(--primary-glow); }
+
+        /* --- NAVIGATION DOCK (Floating Hologram) --- */
+        .dock-container {
+            position: sticky; top: 20px; z-index: 100;
+            display: flex; justify-content: center; margin-bottom: 50px;
+        }
+        
+        .dock {
+            background: rgba(10, 10, 10, 0.7);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255,255,255,0.1);
+            padding: 5px;
+            border-radius: 100px;
+            display: flex; gap: 5px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.8);
+        }
+
+        .dock-btn {
+            padding: 12px 24px;
+            border-radius: 100px;
+            background: transparent;
+            border: 1px solid transparent;
+            color: #666;
+            font-family: 'Syncopate'; font-weight: 700; font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.4s var(--ease-elastic);
+            position: relative; overflow: hidden;
+        }
+
+        .dock-btn:hover { color: #fff; background: rgba(255,255,255,0.05); }
+
+        .dock-btn.active {
+            color: #000;
+            background: var(--text-main);
+            box-shadow: 0 0 25px rgba(255,255,255,0.3);
+            border-color: #fff;
+            transform: translateY(-2px);
+        }
+
+        /* Color Coding */
+        .dock-btn[data-type="red"].active { background: var(--accent-red); box-shadow: 0 0 30px rgba(255, 0, 60, 0.4); border-color: var(--accent-red); }
+        .dock-btn[data-type="green"].active { background: var(--accent-green); box-shadow: 0 0 30px rgba(0, 255, 157, 0.4); border-color: var(--accent-green); }
+        .dock-btn[data-type="blue"].active { background: var(--accent-blue); box-shadow: 0 0 30px rgba(0, 240, 255, 0.4); border-color: var(--accent-blue); }
+
+        /* --- FEED ANIMATION --- */
+        .workout-feed { display: none; animation: floatUp 0.6s cubic-bezier(0.2, 0.8, 0.2, 1); }
+        .workout-feed.active { display: block; }
+
+        @keyframes floatUp {
+            from { opacity: 0; transform: translateY(40px) scale(0.95); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        .day-header { margin-bottom: 20px; text-align: center; }
+        .day-header h2 { font-family: 'Syncopate'; font-size: 2.5rem; text-transform: uppercase; margin: 0; letter-spacing: -1px; }
+        .day-header p { font-size: 0.9rem; color: var(--text-sub); margin-top: 10px; text-transform: uppercase; letter-spacing: 2px; }
+
+        /* Neon Text Glows */
+        .glow-red { color: var(--accent-red); text-shadow: 0 0 30px rgba(255, 0, 60, 0.3); }
+        .glow-green { color: var(--accent-green); text-shadow: 0 0 30px rgba(0, 255, 157, 0.3); }
+        .glow-blue { color: var(--accent-blue); text-shadow: 0 0 30px rgba(0, 240, 255, 0.3); }
+
+        /* --- EXERCISE CARD (WEAPON CRATE) --- */
+        .card {
+            background: linear-gradient(90deg, rgba(20,20,20,0.8) 0%, rgba(20,20,20,0.4) 100%);
+            border-left: 2px solid rgba(255,255,255,0.1);
+            margin-bottom: 12px;
+            padding: 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .card.priming-card {
+            border-left: 2px solid rgba(255, 215, 0, 0.3);
+            background: linear-gradient(90deg, rgba(25,25,15,0.8) 0%, rgba(20,20,20,0.4) 100%);
+        }
+
+        /* Hover Effect: The Scanline */
+        .card::before {
+            content: ''; position: absolute; top:0; left:0; width: 2px; height: 100%;
+            background: #fff;
+            box-shadow: 0 0 15px #fff;
+            opacity: 0; transition: 0.3s;
+        }
+        .card:hover { transform: translateX(10px); background: rgba(30,30,30,0.8); }
+        .card:hover::before { opacity: 1; }
+
+        .card-info h3 { font-family: 'Syncopate'; font-weight: 700; font-size: 1rem; color: #fff; margin-bottom: 5px; }
+        .card-info p { font-size: 0.8rem; color: var(--text-sub); font-family: 'Space Grotesk'; text-transform: uppercase; letter-spacing: 1px; }
+
+        /* The Power Node Checkbox */
+        .node {
+            width: 40px; height: 40px;
+            border: 1px solid #444;
+            display: flex; align-items: center; justify-content: center;
+            transition: 0.5s var(--ease-elastic);
+            position: relative;
+            background: rgba(0,0,0,0.5);
+        }
+        
+        .node::after {
+            content: ''; width: 8px; height: 8px; background: #444;
+            box-shadow: 0 0 0 2px rgba(0,0,0,0.5);
+            transition: 0.5s;
+        }
+
+        /* COMPLETED STATE */
+        .card.done { border-left-color: var(--primary); background: linear-gradient(90deg, rgba(255, 215, 0, 0.05) 0%, transparent 100%); }
+        .card.done h3 { color: #555; text-decoration: line-through; }
+        .card.done::before { background: var(--primary); box-shadow: 0 0 20px var(--primary); opacity: 1; }
+        
+        .card.done .node { border-color: var(--primary); transform: rotate(45deg); box-shadow: 0 0 20px var(--primary-glow); }
+        .card.done .node::after { width: 100%; height: 100%; background: var(--primary); }
+
+        @media (max-width: 700px) {
+            h1 { font-size: 2.5rem; }
+            .dock { width: 100%; justify-content: space-between; padding: 5px 15px; }
+            .dock-btn { padding: 10px 15px; font-size: 0.7rem; }
+            .card-info h3 { font-size: 0.9rem; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="ambient-core"></div>
+<div class="grid-overlay"></div>
+
+<header>
+    <h1>OLYMPIA</h1>
+    <div class="phase-system">
+        <div class="phase-node active"></div>
+        <div class="phase-node"></div>
+        <div class="phase-node"></div>
+        <div class="phase-node"></div>
+    </div>
+</header>
+
+<div class="dock-container">
+    <div class="dock">
+        <button class="dock-btn active" data-type="red" onclick="nav('day1', this)">01</button>
+        <button class="dock-btn" data-type="green" onclick="nav('day2', this)">02</button>
+        <button class="dock-btn" data-type="blue" onclick="nav('day3', this)">03</button>
+        <button class="dock-btn" data-type="red" onclick="nav('day4', this)">04</button>
+        <button class="dock-btn" data-type="green" onclick="nav('day5', this)">05</button>
+        <button class="dock-btn" data-type="blue" onclick="nav('day6', this)">06</button>
+    </div>
+</div>
+
+<div class="container">
+
+    <div class="hud-panel">
+        <span class="panel-label">System Status // Bio-Metrics</span>
+        <div class="stats-grid">
+            <div class="stat-cell">
+                <label>Weight (KG)</label>
+                <input type="number" placeholder="00.0">
+            </div>
+            <div class="stat-cell">
+                <label>Protein (G)</label>
+                <input type="number" placeholder="000">
+            </div>
+            <div class="stat-cell">
+                <label>Energy (KCAL)</label>
+                <input type="number" placeholder="0000">
+            </div>
+        </div>
+    </div>
+
+    <div class="hud-panel">
+        <span class="panel-label">Performance // 1RM Database</span>
+        <div class="stats-grid" style="grid-template-columns: repeat(5, 1fr);">
+            <div class="stat-cell"><label>Bench</label><input type="number" placeholder="-"></div>
+            <div class="stat-cell"><label>Squat</label><input type="number" placeholder="-"></div>
+            <div class="stat-cell"><label>Dead</label><input type="number" placeholder="-"></div>
+            <div class="stat-cell"><label>OHP</label><input type="number" placeholder="-"></div>
+            <div class="stat-cell"><label>Pull</label><input type="number" placeholder="-"></div>
+        </div>
+    </div>
+
+    <!-- ==================== DAY 1 ==================== -->
+    <div id="day1" class="workout-feed active">
+        <div class="day-header">
+            <h2 class="glow-red">Upper A</h2>
+            <p>Chest Thickness // Back Width</p>
+        </div>
+
+        <div class="section-divider">System Priming // Pre-Flight</div>
+        <div class="card priming-card" onclick="toggle(this)"><div class="card-info"><h3>Dead Hang</h3><p>3 Sets × 60s Hold (90s Rest)</p></div><div class="node"></div></div>
+        <div class="card priming-card" onclick="toggle(this)"><div class="card-info"><h3>Cobra Stretch</h3><p>3 Sets × 30s Hold (30s Rest)</p></div><div class="node"></div></div>
+        <div class="card priming-card" onclick="toggle(this)"><div class="card-info"><h3>Cat-Cow</h3><p>3 Sets × 15 Reps</p></div><div class="node"></div></div>
+        <div class="card priming-card" onclick="toggle(this)"><div class="card-info"><h3>Pelvic Bridge</h3><p>3 Sets × 20 Reps (2s Squeeze)</p></div><div class="node"></div></div>
+        <div class="card priming-card" onclick="toggle(this)"><div class="card-info"><h3>Knee Tuck Hang</h3><p>3 Sets × 10 Reps (2s Hold)</p></div><div class="node"></div></div>
+        <div class="card priming-card" onclick="toggle(this)"><div class="card-info"><h3>Tadasana Hold</h3><p>1 Set × 300s (5 Min)</p></div><div class="node"></div></div>
+        <div class="card priming-card" onclick="toggle(this)"><div class="card-info"><h3>Sprint Intervals</h3><p>6-8 Rounds × 30s Sprint / 90s Rest</p></div><div class="node"></div></div>
+        <div class="card priming-card" onclick="toggle(this)"><div class="card-info"><h3>Jump Rope</h3><p>600s (10 Min) Total</p></div><div class="node"></div></div>
+
+        <div class="section-divider" style="color: var(--accent-red);">Combat Block // Main</div>
+        <div class="card" onclick="toggle(this)"><div class="card-info"><h3>Incline Barbell Bench</h3><p>4 Sets × 5–6 Reps</p></div><div class="node"></div></div>
+        <div class="card" onclick="toggle(this)"><div class="card-info"><h3>Flat Dumbbell Press</h3><p>3 Sets × 8–10 Reps</p></div><div class="node"></div></div>
+        <div class="card" onclick="toggle(this)"><div class="card-info"><h3>Chest-Supported Row</h3><p>4 Sets × 8–10 Reps</p></div><div class="node"></div></div>
+        <div class="card" onclick="toggle(this)"><div class="card-info"><h3>Neutral Lat Pulldown</h3><p>3 Sets × 10–12 Reps</p></div><div class="node"></div></div>
+        <div class="card" onclick="toggle(this)"><div class="card-info"><h3>Cable Fly (Mid)</h3><p>2 Sets × 15 Reps</p></div><div class="node"></div></div>
+        <div class="card" onclick="toggle(this)"><div class="card-info"><h3>Face Pulls</h3><p>2 Sets × 15 Reps</p></div><div class="node"></div></div>
+    </div>
+
+    <!-- ==================== DAY 2 ==================== -->
+    <div id="day2" class="workout-feed">
+        <div class="day-header">
+            <h2 class="glow-green">Lower A</h2>
+            <p>Quad Dominance // Structure</p>
+        </div>
+
+        <div class="section-divider">System Priming // Pre-Flight</div>
+        <div class="card priming-card" onclick="toggle(this)"><div class="card-info"><h3>Dead Hang</h3><p>3 Sets × 60s Hold (90s Rest)</p></div><div class="node"></div></div>
+        <div class="card priming-card" onclick="toggle(this)"><div class="card-info"><h3>Cobra Stretch</h3><p>3 Sets × 30s Hold (30s Rest)</p></div><div class="node"></div></div>
+        <div class="card priming-card" onclick="toggle(this)"><div class="card-info"><h3>Cat-Cow</h3><p>3 Sets × 15 Reps</p></div><div class="node"></div></div>
+        <div class="card priming-card" onclick="toggle(this)"><div class="card-info"><h3>Pelvic Bridge</h3><p>3 Sets × 20 Reps (2s Squeeze)</p></div><div class="node"></div></div>
+        <div class="card priming-card" onclick="toggle(this)"><div class="card-info"><h3>Knee Tuck Hang</h3><p>3 Sets × 10 Reps (2s Hold)</p></div><div class="node"></div></div>
+        <div class="card priming-card" onclick="toggle(this)"><div class="card-info"><h3>Tadasana Hold</h3><p>1 Set × 300s (5 Min)</p></div><div class="node"></div></div>
+        <div class="card priming-card" onclick="toggle(this)"><div class="card-info"><h3>Sprint Intervals</h3><p>6-8 Rounds × 30s Sprint / 90s Rest</p></div><div class="node"></div></div>
+        <div class="card priming-card" onclick="toggle(this)"><div class="card-info"><h3>Jump Rope</h3><p>600s (10 Min) Total</p></div><div class="node"></div></div>
+
+        <div class="section-divider" style="color: var(--accent-green);">Combat Block // Main</div>
+        <div class="card" onclick="toggle(this)"><div class="card-info"><h3>High-Bar Squat</h3><p>4 Sets × 5–6 Reps</p></div><div class="node"></div></div>
+        <div class="card" onclick="toggle(this)"><div class="card-info"><h3>Leg Press</h3><p>3 Sets × 10–12 Reps</p></div><div class="node"></div></div>
+        <div class="card" onclick="toggle(this)"><div class="card-info"><h3>Bulgarian Split Squat</h3><p>3 Sets × 8/Leg</p></div><div class="node"></div></div>
+        <div class="card" onclick="toggle(this)"><div class="card-info"><h3>Leg Extension</h3><p>2 Sets × 15–20 Reps</p></div><div class="node"></div></div>
+        <div class="card" onclick="toggle(this)"><div class="card-info"><h3>Standing Calf Raise</h3><p>4 Sets × 12–15 Reps</p></div><div class="node"></div></div>
+    </div>
+
+    <!-- ==================== DAY 3 ==================== -->
+    <div id="day3" class="workout-feed">
+        <div class="day-header">
+            <h2 class="glow-blue">Arms A</h2>
+            <p>Heavy Push // Heavy Pull</p>
+        </div>
+
+        <div class="section-divider">System Priming // Pre-Flight</div>
+        <div class="card priming-card" onclick="toggle(this)"><div class="card-info"><h3>Dead Hang</h3><p>3 Sets × 60s Hold (90s Rest)</p></div><div class="node"></div></div>
+        <div class="card priming-card" onclick="toggle(this)"><div class="card-info"><h3>Cobra Stretch</h3><p>3 Sets × 30s Hold (30s Rest)</p></div><div class="node"></div></div>
+        <div class="card priming-card" onclick="toggle(this)"><div class="card-info"><h3>Cat-Cow</h3><p>3 Sets × 15 Reps</p></div><div class="node"></div></div>
+        <div class="card priming-card" onclick="toggle(this)"><div class="card-info"><h3>Pelvic Bridge</h3><p>3 Sets × 20 Reps (2s Squeeze)</p></div><div class="node"></div></div>
+        <div class="card priming-card" onclick="toggle(this)"><div class="card-info"><h3>Knee Tuck Hang</h3><p>3 Sets × 10 Reps (2s Hold)</p></div><div class="node"></div></div>
+        <div class="card priming-card" onclick="toggle(this)"><div class="card-info"><h3>Tadasana Hold</h3><p>1 Set × 300s (5 Min)</p></div><div class="node"></div></div>
+        <div class="card priming-card" onclick="toggle(this)"><div class="card-info"><h3>Sprint Intervals</h3><p>6-8 Rounds × 30s Sprint / 90s Rest</p></div><div class="node"></div></div>
+        <div class="card priming-card" onclick="toggle(this)"><div class="card-info"><h3>Jump Rope</h3><p>600s (10 Min) Total</p></div><div class="node"></div></div>
+
+        <div class="section-divider" style="color: var(--accent-blue);">Combat Block // Main</div>
+        <div class="card" onclick="toggle(this)"><div class="card-info"><h3>Seated Barbell OHP</h3><p>4 Sets × 5–6 Reps</p></div><div class="node"></div></div>
+        <div class="card" onclick="toggle(this)"><div class="card-info"><h3>DB Lateral Raise</h3><p>4 Sets × 12 Reps</p></div><div class="node"></div></div>
+        <div class="card" onclick="toggle(this)"><div class="card-info"><h3>Close-Grip Bench</h3><p>3 Sets × 6–8 Reps</p></div><div class="node"></div></div>
+        <div class="card" onclick="toggle(this)"><div class="card-info"><h3>EZ-Bar Curl</h3><p>3 Sets × 8–10 Reps</p></div><div class="node"></div></div>
+        <div class="card" onclick="toggle(this)"><div class="card-info"><h3>Overhead Cable Ext</h3><p>2 Sets × 12–15 Reps</p></div><div class="node"></div></div>
+        <div class="card" onclick="toggle(this)"><div class="card-info"><h3>Incline DB Curl</h3><p>2 Sets × 12–15 Reps</p></div><div class="node"></div></div>
+    </div>
+
+    <!-- ==================== DAY 4 ==================== -->
+    <div id="day4" class="workout-feed">
+        <div class="day-header">
+            <h2 class="glow-red">Upper B</h2>
+            <p>V-Taper // Detail</p>
+        </div>
+
+        <div class="section-divider">System Priming // Pre-Flight</div>
+        <div class="card priming-card" onclick="toggle(this)"><div class="card-info"><h3>Dead Hang</h3><p>3 Sets × 60s Hold (90s Rest)</p></div><div class="node"></div></div>
+        <div class="card priming-card" onclick="toggle(this)"><div class="card-info"><h3>Cobra Stretch</h3><p>3 Sets × 30s Hold (30s Rest)</p></div><div class="node"></div></div>
+        <div class="card priming-card" onclick="toggle(this)"><div class="card-info"><h3>Cat-Cow</h3><p>3 Sets × 15 Reps</p></div><div class="node"></div></div>
+        <div class="card priming-card" onclick="toggle(this)"><div class="card-info"><h3>Pelvic Bridge</h3><p>3 Sets × 20 Reps (2s Squeeze)</p></div><div class="node"></div></div>
+        <div class="card priming-card" onclick="toggle(this)"><div class="card-info"><h3>Knee Tuck Hang</h3><p>3 Sets × 10 Reps (2s Hold)</p></div><div class="node"></div></div>
+        <div class="card priming-card" onclick="toggle(this)"><div class="card-info"><h3>Tadasana Hold</h3><p>1 Set × 300s (5 Min)</p></div><div class="node"></div></div>
+        <div class="card priming-card" onclick="toggle(this)"><div class="card-info"><h3>Sprint Intervals</h3><p>6-8 Rounds × 30s Sprint / 90s Rest</p></div><div class="node"></div></div>
+        <div class="card priming-card" onclick="toggle(this)"><div class="card-info"><h3>Jump Rope</h3><p>600s (10 Min) Total</p></div><div class="node"></div></div>
+
+        <div class="section-divider" style="color: var(--accent-red);">Combat Block // Main</div>
+        <div class="card" onclick="toggle(this)"><div class="card-info"><h3>Weighted Pull-Up</h3><p>4 Sets × 6–8 Reps</p></div><div class="node"></div></div>
+        <div class="card" onclick="toggle(this)"><div class="card-info"><h3>One-Arm DB Row</h3><p>3 Sets × 10/Side</p></div><div class="node"></div></div>
+        <div class="card" onclick="toggle(this)"><div class="card-info"><h3>Incline DB Press</h3><p>3 Sets × 8–10 Reps</p></div><div class="node"></div></div>
+        <div class="card" onclick="toggle(this)"><div class="card-info"><h3>Straight-Arm Pulldown</h3><p>3 Sets × 15 Reps</p></div><div class="node"></div></div>
+        <div class="card" onclick="toggle(this)"><div class="card-info"><h3>Low-to-High Fly</h3><p>2 Sets × 15 Reps</p></div><div class="node"></div></div>
+        <div class="card" onclick="toggle(this)"><div class="card-info"><h3>Rear Delt Fly</h3><p>2 Sets × 15 Reps</p></div><div class="node"></div></div>
+    </div>
+
+    <!-- ==================== DAY 5 ==================== -->
+    <div id="day5" class="workout-feed">
+        <div class="day-header">
+            <h2 class="glow-green">Lower B</h2>
+            <p>Posterior Chain // Glutes</p>
+        </div>
+
+        <div class="section-divider">System Priming // Pre-Flight</div>
+        <div class="card priming-card" onclick="toggle(this)"><div class="card-info"><h3>Dead Hang</h3><p>3 Sets × 60s Hold (90s Rest)</p></div><div class="node"></div></div>
+        <div class="card priming-card" onclick="toggle(this)"><div class="card-info"><h3>Cobra Stretch</h3><p>3 Sets × 30s Hold (30s Rest)</p></div><div class="node"></div></div>
+        <div class="card priming-card" onclick="toggle(this)"><div class="card-info"><h3>Cat-Cow</h3><p>3 Sets × 15 Reps</p></div><div class="node"></div></div>
+        <div class="card priming-card" onclick="toggle(this)"><div class="card-info"><h3>Pelvic Bridge</h3><p>3 Sets × 20 Reps (2s Squeeze)</p></div><div class="node"></div></div>
+        <div class="card priming-card" onclick="toggle(this)"><div class="card-info"><h3>Knee Tuck Hang</h3><p>3 Sets × 10 Reps (2s Hold)</p></div><div class="node"></div></div>
+        <div class="card priming-card" onclick="toggle(this)"><div class="card-info"><h3>Tadasana Hold</h3><p>1 Set × 300s (5 Min)</p></div><div class="node"></div></div>
+        <div class="card priming-card" onclick="toggle(this)"><div class="card-info"><h3>Sprint Intervals</h3><p>6-8 Rounds × 30s Sprint / 90s Rest</p></div><div class="node"></div></div>
+        <div class="card priming-card" onclick="toggle(this)"><div class="card-info"><h3>Jump Rope</h3><p>600s (10 Min) Total</p></div><div class="node"></div></div>
+
+        <div class="section-divider" style="color: var(--accent-green);">Combat Block // Main</div>
+        <div class="card" onclick="toggle(this)"><div class="card-info"><h3>Romanian Deadlift</h3><p>4 Sets × 6–8 Reps</p></div><div class="node"></div></div>
+        <div class="card" onclick="toggle(this)"><div class="card-info"><h3>Seated Leg Curl</h3><p>3 Sets × 10–12 Reps</p></div><div class="node"></div></div>
+        <div class="card" onclick="toggle(this)"><div class="card-info"><h3>Walking Lunges</h3><p>3 Sets × 20 Steps</p></div><div class="node"></div></div>
+        <div class="card" onclick="toggle(this)"><div class="card-info"><h3>Hip Thrust</h3><p>2 Sets × 10–12 Reps</p></div><div class="node"></div></div>
+        <div class="card" onclick="toggle(this)"><div class="card-info"><h3>Seated Calf Raise</h3><p>4 Sets × 15–20 Reps</p></div><div class="node"></div></div>
+        <div class="card" onclick="toggle(this)"><div class="card-info"><h3>Hanging Leg Raise</h3><p>3 Sets × 12–15 Reps</p></div><div class="node"></div></div>
+        <div class="card" onclick="toggle(this)"><div class="card-info"><h3>Cable Crunch</h3><p>3 Sets × 20 Reps</p></div><div class="node"></div></div>
+    </div>
+
+    <!-- ==================== DAY 6 ==================== -->
+    <div id="day6" class="workout-feed">
+        <div class="day-header">
+            <h2 class="glow-blue">Arms B</h2>
+            <p>Hypertrophy // Pump</p>
+        </div>
+
+        <div class="section-divider">System Priming // Pre-Flight</div>
+        <div class="card priming-card" onclick="toggle(this)"><div class="card-info"><h3>Dead Hang</h3><p>3 Sets × 60s Hold (90s Rest)</p></div><div class="node"></div></div>
+        <div class="card priming-card" onclick="toggle(this)"><div class="card-info"><h3>Cobra Stretch</h3><p>3 Sets × 30s Hold (30s Rest)</p></div><div class="node"></div></div>
+        <div class="card priming-card" onclick="toggle(this)"><div class="card-info"><h3>Cat-Cow</h3><p>3 Sets × 15 Reps</p></div><div class="node"></div></div>
+        <div class="card priming-card" onclick="toggle(this)"><div class="card-info"><h3>Pelvic Bridge</h3><p>3 Sets × 20 Reps (2s Squeeze)</p></div><div class="node"></div></div>
+        <div class="card priming-card" onclick="toggle(this)"><div class="card-info"><h3>Knee Tuck Hang</h3><p>3 Sets × 10 Reps (2s Hold)</p></div><div class="node"></div></div>
+        <div class="card priming-card" onclick="toggle(this)"><div class="card-info"><h3>Tadasana Hold</h3><p>1 Set × 300s (5 Min)</p></div><div class="node"></div></div>
+        <div class="card priming-card" onclick="toggle(this)"><div class="card-info"><h3>Sprint Intervals</h3><p>6-8 Rounds × 30s Sprint / 90s Rest</p></div><div class="node"></div></div>
+        <div class="card priming-card" onclick="toggle(this)"><div class="card-info"><h3>Jump Rope</h3><p>600s (10 Min) Total</p></div><div class="node"></div></div>
+
+        <div class="section-divider" style="color: var(--accent-blue);">Combat Block // Main</div>
+        <div class="card" onclick="toggle(this)"><div class="card-info"><h3>Cable Lateral (Single)</h3><p>4 Sets × 15 Reps</p></div><div class="node"></div></div>
+        <div class="card" onclick="toggle(this)"><div class="card-info"><h3>Rear Delt Machine</h3><p>3 Sets × 15 Reps</p></div><div class="node"></div></div>
+        <div class="card" onclick="toggle(this)"><div class="card-info"><h3>SS: Rope Pushdown</h3><p>3 Rounds (Superset)</p></div><div class="node"></div></div>
+        <div class="card" onclick="toggle(this)"><div class="card-info"><h3>SS: DB Overhead Ext</h3><p>3 Rounds (Superset)</p></div><div class="node"></div></div>
+        <div class="card" onclick="toggle(this)"><div class="card-info"><h3>SS: Preacher Curl</h3><p>3 Rounds (Superset)</p></div><div class="node"></div></div>
+        <div class="card" onclick="toggle(this)"><div class="card-info"><h3>SS: Hammer Curl</h3><p>3 Rounds (Superset)</p></div><div class="node"></div></div>
+        <div class="card" onclick="toggle(this)"><div class="card-info"><h3>Finisher: Lat Drop Set</h3><p>2 Rounds til Failure</p></div><div class="node"></div></div>
+    </div>
+
+</div>
+
+<script>
+    function nav(dayId, btn) {
+        // Switch Feed
+        document.querySelectorAll('.workout-feed').forEach(el => el.classList.remove('active'));
+        document.getElementById(dayId).classList.add('active');
+
+        // Switch Dock
+        document.querySelectorAll('.dock-btn').forEach(el => el.classList.remove('active'));
+        btn.classList.add('active');
+        
+        // Scroll top slightly
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function toggle(card) {
+        card.classList.toggle('done');
+        // Add haptic vibration if supported
+        if (navigator.vibrate) navigator.vibrate(10);
+    }
+</script>
+
+</body>
+</html>
